@@ -1,0 +1,255 @@
+openapi: "3.1.1"
+info:
+  title: "Task Manager API"
+  version: "1.0.0"
+  description: "API for managing tasks and webhook subscriptions"
+servers:
+  - url: "https://cuureo.com"
+    description: "Production server"
+tags:
+  - name: "Tasks"
+    description: "Operations on tasks"
+  - name: "Webhooks"
+    description: "Manage webhook subscriptions"
+
+paths:
+  /tasks:
+    get:
+      tags:
+        - "Tasks"
+      summary: "Get all tasks"
+      operationId: "getTasks"
+      responses:
+        '200':
+          description: "A list of tasks"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Task"
+
+    post:
+      tags:
+        - "Tasks"
+      summary: "Create a new task"
+      operationId: "createTask"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskInput"
+      responses:
+        '201':
+          description: "Created a new task"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+        '400':
+          description: "Invalid input"
+
+  /tasks/{id}:
+    get:
+      tags:
+        - "Tasks"
+      summary: "Get a task by ID"
+      operationId: "getTask"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+      responses:
+        '200':
+          description: "Task data"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+        '404':
+          description: "Task not found"
+
+    put:
+      tags:
+        - "Tasks"
+      summary: "Update a task by ID"
+      operationId: "updateTask"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskInput"
+      responses:
+        '200':
+          description: "Updated task"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+        '404':
+          description: "Task not found"
+
+    delete:
+      tags:
+        - "Tasks"
+      summary: "Delete a task by ID"
+      operationId: "deleteTask"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+      responses:
+        '200':
+          description: "Task deleted"
+        '404':
+          description: "Task not found"
+
+  /webhooks:
+    get:
+      tags:
+        - "Webhooks"
+      summary: "Get all webhooks"
+      operationId: "getWebhooks"
+      responses:
+        '200':
+          description: "List of webhooks"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Webhook"
+
+    post:
+      tags:
+        - "Webhooks"
+      summary: "Create a new webhook"
+      operationId: "createWebhook"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WebhookInput"
+      responses:
+        '201':
+          description: "Webhook created"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Webhook"
+
+  /webhooks/{id}:
+    delete:
+      tags:
+        - "Webhooks"
+      summary: "Delete a webhook by ID"
+      operationId: "deleteWebhook"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+      responses:
+        '200':
+          description: "Webhook deleted"
+        '404':
+          description: "Webhook not found"
+
+components:
+  schemas:
+    Task:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          description: "Unique identifier"
+          example: 1
+        title:
+          type: "string"
+          description: "Task title"
+          example: "Fix UI bug"
+        description:
+          type: "string"
+          description: "Detailed description"
+          example: "Some detail about the UI issue."
+        status:
+          type: "string"
+          description: "Task status"
+          enum: ["new", "in-progress", "completed"]
+          example: "new"
+        dueDate:
+          type: "string"
+          format: "date-time"
+          description: "When the task is due"
+          example: "2025-01-01T00:00:00Z"
+        createdAt:
+          type: "string"
+          format: "date-time"
+          example: "2024-12-29T21:00:00Z"
+        updatedAt:
+          type: "string"
+          format: "date-time"
+          example: "2024-12-29T21:30:00Z"
+
+    TaskInput:
+      type: "object"
+      properties:
+        title:
+          type: "string"
+        description:
+          type: "string"
+        status:
+          type: "string"
+          enum: ["new", "in-progress", "completed"]
+        dueDate:
+          type: "string"
+          format: "date-time"
+      required:
+        - "title"
+
+    Webhook:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          example: 1
+        url:
+          type: "string"
+          example: "https://example.com/my-webhook-endpoint"
+        eventType:
+          type: "string"
+          example: "task.created"
+        createdAt:
+          type: "string"
+          format: "date-time"
+          example: "2024-12-29T21:00:00Z"
+        updatedAt:
+          type: "string"
+          format: "date-time"
+          example: "2024-12-29T21:30:00Z"
+
+    WebhookInput:
+      type: "object"
+      properties:
+        url:
+          type: "string"
+        eventType:
+          type: "string"
+          enum: ["task.created", "task.updated"]
+      required:
+        - "url"
+        - "eventType"

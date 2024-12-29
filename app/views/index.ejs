@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Task Manager</title>
+  </head>
+  <body>
+    <h1>All Tasks</h1>
+    <ul>
+      <% tasks.forEach(task => { %>
+        <li>
+          <strong>ID:</strong> <%= task.id %> | 
+          <strong>Title:</strong> <%= task.title %> |
+          <strong>Status:</strong> <%= task.status %>
+        </li>
+      <% }) %>
+    </ul>
+  </body>
+</html>
